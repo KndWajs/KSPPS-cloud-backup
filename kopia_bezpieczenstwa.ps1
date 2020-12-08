@@ -1,6 +1,7 @@
 ﻿$host.ui.RawUI.WindowTitle = "TWORZENIE KOPII BEZPIECZEŃSTWA"
 
 $time = Get-Date -Format "yyyyMMdd_HHmmss"
+$mypath = split-path -parent $MyInvocation.MyCommand.Definition
 
 Write-Output "Prosze wlozyc pendrivea"
 Write-Output ""
@@ -24,18 +25,21 @@ catch { "An error occurred." }
 $host.ui.RawUI.WindowTitle = "KOMPRESJA PLIK KOPII BEZPIECZENSTWA PROGRAMU KSPPS"
 
 Write-Output "krok 2/3 - kompresowanie kopi bezp. i zapisywanie na dysku komputera(ok 0,5 minuty)..."
+Write-Output "nazwa kopii - C:\Kopie_bezpieczenstwa\KSPPS_$time.zip"
 
-try { 
-& "C:\Program Files\7-zip\7zG.exe" a -mx1 C:\Kopie_bezpieczenstwa\KSPPS_$time.zip C:\Kopie_bezpieczenstwa\KOPIA.bak
- }
-catch { "An error occurred." }
+& "C:\Program Files\7-zip\7zG.exe" a -mx1 "C:\Kopie_bezpieczenstwa\KSPPS_$time.zip" "C:\Kopie_bezpieczenstwa\KOPIA.bak";
+cd C:
 
 Write-Output "krok 3/3 - zapisywanie kopii na PENIE(ok 1 minuty)..."
+Start-Sleep -s 1.5
+copy "C:\Kopie_bezpieczenstwa\KSPPS_$time.zip" "D:\"
 
-copy C:\Kopie_bezpieczenstwa\KSPPS_$time.zip D:\
+
+java -jar "$mypath\pps-cloud-backup-1.0-SNAPSHOT-jar-with-dependencies.jar"
 
 Write-Output ""
 Write-Output "Dziekuje, to wszystko"
 Write-Output ""
 Write-Output ""
 Write-Output ""
+pause
