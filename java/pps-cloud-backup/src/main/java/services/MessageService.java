@@ -13,4 +13,8 @@ public class MessageService {
             System.out.println(i + " - " + f.getName() + " - " + new Date(f.lastModified()));
         }
     }
+
+    public static void emptyPathMessage() {
+        System.out.println("There is no files to synchronisation");
+    }
 }

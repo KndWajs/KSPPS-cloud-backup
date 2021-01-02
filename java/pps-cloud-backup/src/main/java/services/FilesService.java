@@ -13,24 +13,29 @@ public class FilesService {
             BasicConfigs.NUMBER_OF_FILES_TO_SYNC - BasicConfigs.NUMBER_OF_OLDEST_FILES;
 
     public static List<File> getRelevantLocalFiles(String path) {
+        File[] filesArray = new File(path).listFiles();
+        if (filesArray == null) {
+            MessageService.emptyPathMessage();
+            return new ArrayList<>();
+        }
+
         List<File> files = new ArrayList<>(Arrays.asList(new File(path).listFiles()));
 
         if (files.size() <= BasicConfigs.NUMBER_OF_FILES_TO_SYNC) {
             return files;
         }
 
+        Collections.sort(files, Comparator.comparingLong(File::lastModified).reversed());
         List<File> oldestFiles = findOldestRelevantFiles(files);
-
         files.subList(BasicConfigs.NUMBER_OF_FILES_TO_SYNC - oldestFiles.size(), files.size()).clear();
         files.addAll(oldestFiles);
 
-
-        Collections.sort(files, Comparator.comparingLong(File::lastModified).reversed());
         return files;
     }
 
     private static List<File> findOldestRelevantFiles(List<File> files) {
         List<File> receivedFiles = new ArrayList<>(files);
+        Collections.sort(receivedFiles, Comparator.comparingLong(File::lastModified));
         List<File> oldestFiles = receivedFiles.subList(0, receivedFiles.size() - NUMBER_OF_NEWEST_FILES);
 
         ArrayList<File> oldestRelevantFiles = oldestFiles.stream().filter(file -> file.lastModified() >
